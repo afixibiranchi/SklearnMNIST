@@ -125,7 +125,7 @@ print "NN Score "+ str(gridNN.best_score_)
 print "NN  best Params "+str(gridNN.best_params_)
 
 #SVM with SVC
-flag = False
+flag = True
 if flag is True:
     svm = SVC()
     svmNu = NuSVC()
