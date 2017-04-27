@@ -14,6 +14,8 @@ from skimage.feature import hog as HOG
 
 #Importing Models
 from sklearn.svm import NuSVC
+from sklearn.externals import joblib
+#Data preparation
 Zero = '/home/sezan92/SklearnMNIST/mnist_png/testing/0'
 One= '/home/sezan92/SklearnMNIST/mnist_png/testing/1'
 Two = '/home/sezan92/SklearnMNIST/mnist_png/testing/2'
@@ -26,6 +28,7 @@ Eight = '/home/sezan92/SklearnMNIST/mnist_png/testing/8'
 Nine = '/home/sezan92/SklearnMNIST/mnist_png/testing/9'
 
 testData=[]
+realResponse =[]
 ZeroImages = [ f for f in listdir(Zero) if isfile(join(Zero,f)) ]
 OneImages = [ f for f in listdir(One) if isfile(join(One,f)) ]
 TwoImages = [ f for f in listdir(Two) if isfile(join(Two,f)) ]
@@ -37,7 +40,7 @@ SevenImages = [ f for f in listdir(Seven) if isfile(join(Seven,f)) ]
 EightImages = [ f for f in listdir(Eight) if isfile(join(Eight,f)) ]
 NineImages = [ f for f in listdir(Nine) if isfile(join(Nine,f)) ]
 
-def ReadImages(ListName,FolderName):
+def ReadImages(ListName,FolderName,Label):
     global NumberList
     global responseData
     global testData
@@ -51,6 +54,20 @@ def ReadImages(ListName,FolderName):
         NumberList.append(img)    
         feature = HOG(cv2.cvtColor(img,cv2.COLOR_RGB2GRAY))
         testData.append(feature.T)
-svm = NuSVC(nu=0.100000000000000001,'linear')
-svm.fit()
-  
+        realResponse.append(Label)
+
+ReadImages(ZeroImages,Zero,0)
+ReadImages(OneImages,One,1)
+ReadImages(TwoImages,Two,2)
+ReadImages(ThreeImages,Three,3)
+ReadImages(FourImages,Four,4)
+ReadImages(FiveImages,Five,5)
+ReadImages(SixImages,Six,6)
+ReadImages(SevenImages,Seven,7)
+ReadImages(EightImages,Eight,8)
+ReadImages(NineImages,Nine,9)
+
+clf = joblib.load('gridSVMNu.pkl')  
+pred = clf.predict(np.float32(testData))
+real =np.float32(realResponse)
+print abs(((pred==real).sum())*100/1000)
