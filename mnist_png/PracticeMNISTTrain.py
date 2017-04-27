@@ -21,16 +21,16 @@ from sklearn.ensemble import RandomForestClassifier
 
 #Data Preparation
 
-Zero = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/0'
-One= '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/1'
-Two = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/2'
-Three = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/3'
-Four = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/4'
-Five = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/5'
-Six = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/6'
-Seven = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/7'
-Eight = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/8'
-Nine = '/home/sezan92/SklearnPracticeTitanic/mnist_png/training/9'
+Zero = '/home/sezan92/SklearnMNIST/mnist_png/training/0'
+One= '/home/sezan92/SklearnMNIST/mnist_png/training/1'
+Two = '/home/sezan92/SklearnMNIST/mnist_png/training/2'
+Three = '/home/sezan92/SklearnMNIST/mnist_png/training/3'
+Four = '/home/sezan92/SklearnMNIST/mnist_png/training/4'
+Five = '/home/sezan92/SklearnMNIST/mnist_png/training/5'
+Six = '/home/sezan92/SklearnMNIST/mnist_png/training/6'
+Seven = '/home/sezan92/SklearnMNIST/mnist_png/training/7'
+Eight = '/home/sezan92/SklearnMNIST/mnist_png/training/8'
+Nine = '/home/sezan92/SklearnMNIST/mnist_png/training/9'
 
 trainData = []
 responseData = []
@@ -46,16 +46,6 @@ SevenImages = [ f for f in listdir(Seven) if isfile(join(Seven,f)) ]
 EightImages = [ f for f in listdir(Eight) if isfile(join(Eight,f)) ]
 NineImages = [ f for f in listdir(Nine) if isfile(join(Nine,f)) ]
 
-def deskew(img):
-    SZ=20
-    m = cv2.moments(img)
-    affine_flags = cv2.WARP_INVERSE_MAP|cv2.INTER_LINEAR
-    if abs(m['mu02']) < 1e-2:
-        return img.copy()
-    skew = m['mu11']/m['mu02']
-    M = np.float32([[1, skew, -0.5*SZ*skew], [0, 1, 0]])
-    img = cv2.warpAffine(img,M,(SZ, SZ),flags=affine_flags)
-    return img
 
 
 def ReadImages(ListName,FolderName,Label):
@@ -138,13 +128,22 @@ print "NN  best Params "+str(gridNN.best_params_)
 flag = False
 if flag is True:
     svm = SVC()
+    svmNu = NuSVC()
+    nu_options =np.arange(0.1,1,100)
     kernel_options = [ 'linear', 'sigmoid', 'rbf']
     param_gridSVM = dict(kernel = kernel_options)
+    param_gridSVMNu = dict(kernel = kernel_options,nu =
+                         nu_options)
     gridSVM = GridSearchCV(svm,param_gridSVM,cv=10,
                        scoring = 'accuracy')
     gridSVM.fit(X,y)
     print "SVM Score "+str(gridSVM.best_score_)
     print "SVM best Params"+str(gridSVM.best_params_)
+    gridSVMNu = GridSearchCV(svmNu,param_gridSVMNu,cv=10,
+                       scoring = 'accuracy')
+    gridSVMNu.fit(X,y)
+    print "SVM with NuSVC Score "+str(gridSVMNu.best_score_)
+    print "SVM with NuSVC best Params"+str(gridSVMNu.best_params_)
 
 #Random Forest
 dtree = DecisionTreeClassifier(random_state=0)
